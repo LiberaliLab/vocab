@@ -1,0 +1,27 @@
+[project]
+name = "liblab-vocab"
+version = "0.1.0"
+description = "Validation, ID assignment and publishing for the Liberali Lab controlled vocabularies"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "rdflib>=7.0",
+]
+
+[project.scripts]
+vocab = "liblab_vocab.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/liblab_vocab"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

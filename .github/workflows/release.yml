@@ -1,0 +1,102 @@
+name: release
+
+# Pushing a tag vX.Y.Z on main publishes that release:
+#   https://liberalilab.github.io/vocab/vX.Y.Z/...  and  .../latest/...
+# Published versions accumulate on the gh-pages branch and are never rebuilt.
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write # push gh-pages, create the GitHub release
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v6
+
+      - run: uv sync --locked
+
+      - name: Check the tag is on main
+        run: |
+          git fetch --quiet origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$TAG does not point to a commit on main. Delete the tag and tag a commit on main."
+            exit 1
+          fi
+
+      - name: Validate against the previous release
+        run: |
+          previous=$(uv run vocab previous-tag "$TAG")
+          args=()
+          if [ -n "$previous" ]; then
+            args+=(--baseline "$previous")
+          fi
+          uv run vocab validate "${args[@]}"
+
+      - name: Check the version number
+        run: uv run vocab check-version "$TAG" | tee notes.md | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Build
+        run: uv run vocab build --version "$TAG" --out build
+
+      - name: Add the release to the gh-pages branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin gh-pages > /dev/null; then
+            git fetch --quiet origin gh-pages
+            git worktree add -B gh-pages site origin/gh-pages
+          else
+            git worktree add --orphan -b gh-pages site
+          fi
+          uv run vocab publish-site --site site --build build --version "$TAG"
+          cd site
+          git add -A
+          if git diff --cached --quiet; then
+            echo "gh-pages already has $TAG."
+          else
+            git commit --quiet -m "Publish $TAG"
+            git push origin gh-pages
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          (cd build && zip -qr "../vocab-$TAG.zip" .)
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists."
+          else
+            gh release create "$TAG" "vocab-$TAG.zip" --verify-tag --title "$TAG" --notes-file notes.md
+          fi

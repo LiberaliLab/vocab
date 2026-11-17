@@ -1,0 +1,20 @@
+# Settings shared by every vocabulary in this repository.
+
+[vocabulary]
+title = "Liberali Lab controlled vocabularies"
+# Every term ID is "<id_prefix>:" followed by id_digits digits, e.g. LIBLAB:0000123.
+id_prefix = "LIBLAB"
+id_digits = 7
+# Term IRIs are base_iri + "LIBLAB_0000123". The w3id.org redirect is not registered yet.
+base_iri = "https://w3id.org/liblab/"
+# Where the released files are served.
+publish_url = "https://liberalilab.github.io/vocab/"
+# Directory holding one <vocabulary>.tsv per vocabulary.
+directory = "vocabularies"
+
+# Prefixes allowed in external_mapping, and the IRI each one expands to.
+[mapping_prefixes]
+FBbi = "http://purl.obolibrary.org/obo/FBbi_"
+CL = "http://purl.obolibrary.org/obo/CL_"
+UBERON = "http://purl.obolibrary.org/obo/UBERON_"
+NCBITaxon = "http://purl.obolibrary.org/obo/NCBITaxon_"

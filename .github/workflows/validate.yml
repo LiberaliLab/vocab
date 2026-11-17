@@ -1,0 +1,50 @@
+name: validate
+
+# Runs on every pull request (including the ones the sheet sync opens) and on main.
+# Make the "validate" check required in the main branch ruleset.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags and the base branch are needed as baselines
+
+      - uses: astral-sh/setup-uv@v6
+
+      - run: uv sync --locked
+
+      - name: Tests
+        run: uv run pytest -q
+
+      - name: Validate vocabularies
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          args=(--against-latest-release)
+          if [ -n "$BASE_REF" ]; then
+            args+=(--baseline "origin/$BASE_REF")
+          fi
+          uv run vocab validate "${args[@]}"
+
+      - name: Changes since the last release
+        run: |
+          latest=$(uv run vocab latest-tag)
+          if [ -n "$latest" ]; then
+            uv run vocab diff "$latest" --summary "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No release yet." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
