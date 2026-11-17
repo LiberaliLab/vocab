@@ -5,8 +5,8 @@ The settings that live outside the code. Tick each item when done.
 ## GitHub (LiberaliLab/vocab)
 
 - [x] Repository `LiberaliLab/vocab` created.
-- [ ] **Public visibility.** Pages on the Free organisation plan needs a public repository, and the vocabularies are public anyway.
-- [ ] **Team `vocab-curators`** (Maks for now) with the Maintain role on the repository. Other lab members need no GitHub access.
+- [x] **Public visibility.** Pages on the Free organisation plan needs a public repository, and the vocabularies are public anyway.
+- [x] **Team `vocab-curators`** (Maks for now) with the Maintain role on the repository. Other lab members need no GitHub access.
 - [ ] **Branch ruleset on `main`** (Settings → Rules → Rulesets → New branch ruleset, target `main` only):
   - require a pull request before merging, with 1 approval;
   - require the status check `validate` (it shows up after the first workflow run);
@@ -20,8 +20,8 @@ The settings that live outside the code. Tick each item when done.
 
 ## Google
 
-- [ ] **Google Cloud project** (e.g. `liblab-vocab`) with the **Google Sheets API** enabled.
-- [ ] **Service account** (e.g. `vocab-sync`). How GitHub Actions signs in as it is still to be decided:
+- [x] **Google Cloud project** (e.g. `liblab-vocab`) with the **Google Sheets API** enabled.
+- [x] **Service account** (e.g. `vocab-sync`). How GitHub Actions signs in as it is still to be decided:
   - *Workload Identity Federation* (recommended, keyless): a workload identity pool with a GitHub provider limited to `LiberaliLab/vocab`. The exact `gcloud` commands will come with the sync workflow.
   - *JSON key*: stored as the repository secret `GOOGLE_SA_KEY`. Simpler, but a long-lived secret.
 - [ ] **The sheet**, shared as Editor with lab members and with the service account's email address. The service account writes the new IDs back, so it needs edit rights.
