@@ -1,0 +1,93 @@
+name: sync
+
+# Pulls the Google Sheet into vocabularies/, assigns IDs (and writes them back into
+# the sheet), and opens or updates one pull request from the branch sheet-sync.
+#
+# Needs (see docs/setup.md):
+#   variables  SHEET_ID, GCP_WIF_PROVIDER, GCP_SERVICE_ACCOUNT, SYNC_APP_ID
+#   secret     SYNC_APP_PRIVATE_KEY
+# Google sign-in uses Workload Identity Federation: no Google key is stored here.
+
+on:
+  schedule:
+    - cron: "17 2 * * *" # nightly, 02:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # lets google-github-actions/auth exchange the GitHub token
+
+concurrency:
+  group: sync
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  BRANCH: sheet-sync
+
+jobs:
+  sync:
+    # The Google trust rule only accepts runs on main, so fail clearly elsewhere.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      # A GitHub App token, so that validate runs on the pull request. Pull
+      # requests opened with the workflow's own token do not trigger workflows.
+      - id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.SYNC_APP_ID }}
+          private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - uses: astral-sh/setup-uv@v6
+
+      - run: uv sync --locked --extra sheets
+
+      - name: Pull the sheet
+        env:
+          SHEET_ID: ${{ vars.SHEET_ID }}
+        run: |
+          uv run vocab sync-sheet --report "$RUNNER_TEMP/report.md"
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update the pull request
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          existing=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          # status, not diff, so that a new vocabulary (untracked file) counts too
+          if [ -z "$(git status --porcelain -- vocabularies/)" ]; then
+            echo "The sheet matches main."
+            if [ -n "$existing" ]; then
+              gh pr close "$existing" --delete-branch \
+                --comment "The sheet now matches main, so there is nothing left to merge."
+            fi
+            exit 0
+          fi
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${APP_SLUG}[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add vocabularies/
+          git commit --quiet -m "Sync vocabularies from the sheet"
+          git push --force origin "$BRANCH"
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --body-file "$RUNNER_TEMP/report.md"
+          else
+            gh pr create --base main --head "$BRANCH" \
+              --title "Vocabulary changes from the sheet" \
+              --body-file "$RUNNER_TEMP/report.md"
+          fi

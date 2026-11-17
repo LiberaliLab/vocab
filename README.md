@@ -21,11 +21,11 @@ Each release has, per vocabulary, `<name>.json`, `<name>.csv` and `<name>.ttl` (
 ## How it works
 
 1. Lab members edit the shared Google Sheet. There is one tab per vocabulary. They leave `id` empty on new rows and never delete rows.
-2. A sync job reads the sheet, assigns IDs, validates and opens a pull request with the changes. *(Not built yet; see [docs/setup.md](docs/setup.md).)*
+2. A sync job (nightly, or Actions → sync → Run workflow) reads the sheet, assigns IDs and writes them back into the sheet, validates, and opens or updates one pull request from the branch `sheet-sync`. Validation problems are listed in the pull request so the editor can fix them in the sheet.
 3. The curator reviews and merges the pull request. Nothing is published yet.
 4. The curator tags a release (`vX.Y.Z`). CI checks the version number, builds the files and publishes them under the new version and `latest`.
 
-`vocabularies/*.tsv` in this repo is the source of truth. The sheet is where people edit.
+`vocabularies/*.tsv` holds the reviewed state, and the sheet is where people edit. Changes flow one way, from the sheet to the repo: an edit made directly to a TSV file is overwritten by the next sync unless the same edit is made in the sheet. One-time configuration of GitHub and Google is in [docs/setup.md](docs/setup.md).
 
 ## Term columns
 
@@ -78,4 +78,4 @@ uv run pytest
 uv run vocab validate --against-latest-release
 ```
 
-Other commands: `vocab assign-ids`, `vocab diff <ref>`, `vocab check-version vX.Y.Z`, `vocab build --version X.Y.Z --out build/`. Run `uv run vocab --help` for details.
+Other commands: `vocab sync-sheet --sheet <ID> --no-write-back` (needs `uv sync --extra sheets` and `gcloud auth application-default login --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/cloud-platform`), `vocab assign-ids`, `vocab diff <ref>`, `vocab check-version vX.Y.Z`, `vocab build --version X.Y.Z --out build/`. Run `uv run vocab --help` for details.
