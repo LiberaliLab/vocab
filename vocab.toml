@@ -12,6 +12,14 @@ publish_url = "https://liberalilab.github.io/vocab/"
 # Directory holding one <vocabulary>.tsv per vocabulary.
 directory = "vocabularies"
 
+# What each release publishes.
+[publish]
+# Files built per vocabulary: any of "json", "csv", "ttl" (SKOS/Turtle).
+# Turtle is off until the w3id.org namespace is registered and the IRIs resolve.
+formats = ["json", "csv"]
+# Put term and vocabulary IRIs in the JSON files. Off for the same reason.
+iris = false
+
 # Prefixes allowed in external_mapping, and the IRI each one expands to.
 [mapping_prefixes]
 FBbi = "http://purl.obolibrary.org/obo/FBbi_"

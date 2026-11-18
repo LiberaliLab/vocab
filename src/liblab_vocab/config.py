@@ -17,6 +17,8 @@ class Config:
     publish_url: str
     directory: str
     mapping_prefixes: dict[str, str] = field(default_factory=dict)
+    formats: tuple[str, ...] = ("json", "csv")
+    publish_iris: bool = False
 
     @property
     def id_regex(self) -> re.Pattern[str]:
@@ -42,9 +44,17 @@ class Config:
         return self.mapping_prefixes[prefix] + local
 
 
+FORMATS = ("json", "csv", "ttl")
+
+
 def load_config(path: str | Path = "vocab.toml") -> Config:
     data = tomllib.loads(Path(path).read_text(encoding="utf-8"))
     vocab = data["vocabulary"]
+    publish = data.get("publish", {})
+    formats = tuple(publish.get("formats", ("json", "csv")))
+    unknown = set(formats) - set(FORMATS)
+    if unknown or not formats:
+        raise ValueError(f"[publish] formats must be a non-empty list of {', '.join(FORMATS)}")
     return Config(
         title=vocab["title"],
         id_prefix=vocab["id_prefix"],
@@ -53,4 +63,6 @@ def load_config(path: str | Path = "vocab.toml") -> Config:
         publish_url=vocab["publish_url"],
         directory=vocab.get("directory", "vocabularies"),
         mapping_prefixes=dict(data.get("mapping_prefixes", {})),
+        formats=formats,
+        publish_iris=bool(publish.get("iris", False)),
     )

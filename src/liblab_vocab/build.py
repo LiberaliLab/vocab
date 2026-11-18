@@ -1,4 +1,7 @@
-"""Release outputs: JSON for our tooling, CSV and SKOS/Turtle for interop."""
+"""Release outputs: JSON for our tooling, CSV and (optionally) SKOS/Turtle for interop.
+
+Which files are built, and whether JSON carries IRIs, is set under [publish] in vocab.toml.
+"""
 
 from __future__ import annotations
 
@@ -17,9 +20,10 @@ LANG = "en"
 
 
 def term_record(term: Term, config: Config) -> dict:
-    return {
-        "id": term.id,
-        "iri": config.term_iri(term.id),
+    record = {"id": term.id}
+    if config.publish_iris:
+        record["iri"] = config.term_iri(term.id)
+    return record | {
         "label": term.label,
         "definition": term.definition,
         "synonyms": term.synonym_list,
@@ -31,12 +35,10 @@ def term_record(term: Term, config: Config) -> dict:
 
 
 def vocabulary_json(name: str, terms: list[Term], config: Config, version: str) -> dict:
-    return {
-        "vocabulary": name,
-        "version": version,
-        "iri": config.scheme_iri(name),
-        "terms": [term_record(t, config) for t in terms],
-    }
+    data = {"vocabulary": name, "version": version}
+    if config.publish_iris:
+        data["iri"] = config.scheme_iri(name)
+    return data | {"terms": [term_record(t, config) for t in terms]}
 
 
 def vocabulary_csv(terms: list[Term]) -> str:
@@ -104,20 +106,28 @@ def build(vocabs: Vocabularies, config: Config, version: str, out_dir: str | Pat
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     written = []
+    formats = config.formats
     for name, terms in sorted(vocabs.items()):
-        written.append(_write(out / f"{name}.json", _json(vocabulary_json(name, terms, config, version))))
-        written.append(_write(out / f"{name}.csv", vocabulary_csv(terms)))
-        graph = skos_graph({name: terms}, config, version)
-        written.append(_write(out / f"{name}.ttl", graph.serialize(format="turtle")))
-
-    written.append(_write(out / "all.ttl", skos_graph(vocabs, config, version).serialize(format="turtle")))
+        if "json" in formats:
+            data = vocabulary_json(name, terms, config, version)
+            written.append(_write(out / f"{name}.json", _json(data)))
+        if "csv" in formats:
+            written.append(_write(out / f"{name}.csv", vocabulary_csv(terms)))
+        if "ttl" in formats:
+            graph = skos_graph({name: terms}, config, version)
+            written.append(_write(out / f"{name}.ttl", graph.serialize(format="turtle")))
+    if "ttl" in formats:
+        all_ttl = skos_graph(vocabs, config, version).serialize(format="turtle")
+        written.append(_write(out / "all.ttl", all_ttl))
 
     # One lookup table for every ID, whichever vocabulary it is in. A w3id.org
     # redirect or a client can use it to resolve an ID on its own.
-    terms_index = {
-        t.id: {"vocabulary": t.vocabulary, "label": t.label, "status": t.status, "iri": config.term_iri(t.id)}
-        for t in sorted(all_terms(vocabs), key=lambda t: t.id)
-    }
+    terms_index = {}
+    for t in sorted(all_terms(vocabs), key=lambda t: t.id):
+        entry = {"vocabulary": t.vocabulary, "label": t.label, "status": t.status}
+        if config.publish_iris:
+            entry["iri"] = config.term_iri(t.id)
+        terms_index[t.id] = entry
     written.append(_write(out / "terms.json", _json(terms_index)))
 
     index = {
@@ -130,7 +140,7 @@ def build(vocabs: Vocabularies, config: Config, version: str, out_dir: str | Pat
                 "name": name,
                 "terms": len(terms),
                 "active_terms": sum(t.active for t in terms),
-                "files": {ext: f"{name}.{ext}" for ext in ("json", "csv", "ttl")},
+                "files": {ext: f"{name}.{ext}" for ext in formats},
             }
             for name, terms in sorted(vocabs.items())
         ],
