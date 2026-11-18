@@ -1,0 +1,33 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix liblab: <https://w3id.org/liblab/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+liblab:LIBLAB_0000009 a skos:Concept ;
+    skos:definition "term value is unknown to the curator"@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/sentinel_value> ;
+    skos:notation "LIBLAB:0000009" ;
+    skos:prefLabel "unknown"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/sentinel_value> .
+
+liblab:LIBLAB_0000010 a skos:Concept ;
+    skos:definition "term does not apply"@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/sentinel_value> ;
+    skos:notation "LIBLAB:0000010" ;
+    skos:prefLabel "na"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/sentinel_value> .
+
+liblab:LIBLAB_0000011 a skos:Concept ;
+    skos:definition "term is know but missing from the vocabulary"@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/sentinel_value> ;
+    skos:notation "LIBLAB:0000011" ;
+    skos:prefLabel "unavailable"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/sentinel_value> .
+
+<https://w3id.org/liblab/vocabulary/sentinel_value> a skos:ConceptScheme ;
+    dcterms:title "sentinel_value" ;
+    owl:versionInfo "0.0.1" ;
+    skos:hasTopConcept liblab:LIBLAB_0000009,
+        liblab:LIBLAB_0000010,
+        liblab:LIBLAB_0000011 .
+

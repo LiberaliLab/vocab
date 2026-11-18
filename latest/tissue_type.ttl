@@ -1,0 +1,42 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix liblab: <https://w3id.org/liblab/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+liblab:LIBLAB_0000005 a skos:Concept ;
+    skos:definition "Sample material taken directly from an organism, such as a biopsy, explant or dissected organ, rather than grown in culture."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/tissue_type> ;
+    skos:notation "LIBLAB:0000005" ;
+    skos:prefLabel "tissue"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/tissue_type> .
+
+liblab:LIBLAB_0000007 a skos:Concept ;
+    skos:altLabel "established cell line"@en ;
+    skos:broader liblab:LIBLAB_0000006 ;
+    skos:definition "A cell culture derived from an established cell population that can be propagated over many passages."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/tissue_type> ;
+    skos:notation "LIBLAB:0000007" ;
+    skos:prefLabel "cell line"@en .
+
+liblab:LIBLAB_0000008 a skos:Concept ;
+    skos:definition "A three-dimensional multicellular structure grown in vitro from stem or progenitor cells that self-organises to reproduce aspects of an organ's architecture and function."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/tissue_type> ;
+    skos:notation "LIBLAB:0000008" ;
+    skos:prefLabel "organoid"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/tissue_type> .
+
+liblab:LIBLAB_0000006 a skos:Concept ;
+    skos:definition "Sample material consisting of cells grown in vitro, outside the organism they came from."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/tissue_type> ;
+    skos:narrower liblab:LIBLAB_0000007 ;
+    skos:notation "LIBLAB:0000006" ;
+    skos:prefLabel "cell culture"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/tissue_type> .
+
+<https://w3id.org/liblab/vocabulary/tissue_type> a skos:ConceptScheme ;
+    dcterms:title "tissue_type" ;
+    owl:versionInfo "0.0.1" ;
+    skos:hasTopConcept liblab:LIBLAB_0000005,
+        liblab:LIBLAB_0000006,
+        liblab:LIBLAB_0000008 .
+

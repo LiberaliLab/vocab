@@ -1,0 +1,48 @@
+{
+  "title": "Liberali Lab controlled vocabularies",
+  "version": "0.0.1",
+  "id_prefix": "LIBLAB",
+  "list_separator": "|",
+  "vocabularies": [
+    {
+      "name": "imaging_modality",
+      "terms": 3,
+      "active_terms": 3,
+      "files": {
+        "json": "imaging_modality.json",
+        "csv": "imaging_modality.csv",
+        "ttl": "imaging_modality.ttl"
+      }
+    },
+    {
+      "name": "labelling_method",
+      "terms": 1,
+      "active_terms": 1,
+      "files": {
+        "json": "labelling_method.json",
+        "csv": "labelling_method.csv",
+        "ttl": "labelling_method.ttl"
+      }
+    },
+    {
+      "name": "sentinel_value",
+      "terms": 3,
+      "active_terms": 3,
+      "files": {
+        "json": "sentinel_value.json",
+        "csv": "sentinel_value.csv",
+        "ttl": "sentinel_value.ttl"
+      }
+    },
+    {
+      "name": "tissue_type",
+      "terms": 4,
+      "active_terms": 4,
+      "files": {
+        "json": "tissue_type.json",
+        "csv": "tissue_type.csv",
+        "ttl": "tissue_type.ttl"
+      }
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix fbbi: <http://purl.obolibrary.org/obo/FBbi_> .
+@prefix liblab: <https://w3id.org/liblab/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+liblab:LIBLAB_0000002 a skos:Concept ;
+    skos:altLabel "LSFM"@en,
+        "SPIM"@en,
+        "light sheet fluorescence microscopy"@en,
+        "selective plane illumination microscopy"@en ;
+    skos:broader liblab:LIBLAB_0000001 ;
+    skos:definition "Fluorescence microscopy in which the sample is illuminated from the side by a thin sheet of light, so that only the focal plane is excited, and imaged through a detection objective perpendicular to the sheet."@en ;
+    skos:exactMatch fbbi:00000369 ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/imaging_modality> ;
+    skos:notation "LIBLAB:0000002" ;
+    skos:prefLabel "light-sheet microscopy"@en .
+
+liblab:LIBLAB_0000003 a skos:Concept ;
+    skos:altLabel "high content imaging"@en,
+        "high-content microscopy"@en ;
+    skos:broader liblab:LIBLAB_0000001 ;
+    skos:definition "Automated microscopy of many samples, typically in multi-well plates, combined with quantitative image analysis that extracts many measurements per cell or sample."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/imaging_modality> ;
+    skos:notation "LIBLAB:0000003" ;
+    skos:prefLabel "high content microscopy"@en .
+
+liblab:LIBLAB_0000004 a skos:Concept ;
+    skos:altLabel "IF"@en,
+        "immunofluorescent staining"@en ;
+    skos:definition "Labelling in which antibodies carrying a fluorophore, either directly or through a fluorescent secondary antibody, are used to detect specific antigens in the sample."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/labelling_method> ;
+    skos:notation "LIBLAB:0000004" ;
+    skos:prefLabel "immunofluorescence"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/labelling_method> .
+
+liblab:LIBLAB_0000005 a skos:Concept ;
+    skos:definition "Sample material taken directly from an organism, such as a biopsy, explant or dissected organ, rather than grown in culture."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/tissue_type> ;
+    skos:notation "LIBLAB:0000005" ;
+    skos:prefLabel "tissue"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/tissue_type> .
+
+liblab:LIBLAB_0000007 a skos:Concept ;
+    skos:altLabel "established cell line"@en ;
+    skos:broader liblab:LIBLAB_0000006 ;
+    skos:definition "A cell culture derived from an established cell population that can be propagated over many passages."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/tissue_type> ;
+    skos:notation "LIBLAB:0000007" ;
+    skos:prefLabel "cell line"@en .
+
+liblab:LIBLAB_0000008 a skos:Concept ;
+    skos:definition "A three-dimensional multicellular structure grown in vitro from stem or progenitor cells that self-organises to reproduce aspects of an organ's architecture and function."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/tissue_type> ;
+    skos:notation "LIBLAB:0000008" ;
+    skos:prefLabel "organoid"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/tissue_type> .
+
+liblab:LIBLAB_0000009 a skos:Concept ;
+    skos:definition "term value is unknown to the curator"@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/sentinel_value> ;
+    skos:notation "LIBLAB:0000009" ;
+    skos:prefLabel "unknown"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/sentinel_value> .
+
+liblab:LIBLAB_0000010 a skos:Concept ;
+    skos:definition "term does not apply"@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/sentinel_value> ;
+    skos:notation "LIBLAB:0000010" ;
+    skos:prefLabel "na"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/sentinel_value> .
+
+liblab:LIBLAB_0000011 a skos:Concept ;
+    skos:definition "term is know but missing from the vocabulary"@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/sentinel_value> ;
+    skos:notation "LIBLAB:0000011" ;
+    skos:prefLabel "unavailable"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/sentinel_value> .
+
+liblab:LIBLAB_0000006 a skos:Concept ;
+    skos:definition "Sample material consisting of cells grown in vitro, outside the organism they came from."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/tissue_type> ;
+    skos:narrower liblab:LIBLAB_0000007 ;
+    skos:notation "LIBLAB:0000006" ;
+    skos:prefLabel "cell culture"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/tissue_type> .
+
+<https://w3id.org/liblab/vocabulary/labelling_method> a skos:ConceptScheme ;
+    dcterms:title "labelling_method" ;
+    owl:versionInfo "0.0.1" ;
+    skos:hasTopConcept liblab:LIBLAB_0000004 .
+
+liblab:LIBLAB_0000001 a skos:Concept ;
+    skos:definition "Imaging of a specimen at magnification using a microscope."@en ;
+    skos:exactMatch fbbi:00000241 ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/imaging_modality> ;
+    skos:narrower liblab:LIBLAB_0000002,
+        liblab:LIBLAB_0000003 ;
+    skos:notation "LIBLAB:0000001" ;
+    skos:prefLabel "microscopy"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/imaging_modality> .
+
+<https://w3id.org/liblab/vocabulary/imaging_modality> a skos:ConceptScheme ;
+    dcterms:title "imaging_modality" ;
+    owl:versionInfo "0.0.1" ;
+    skos:hasTopConcept liblab:LIBLAB_0000001 .
+
+<https://w3id.org/liblab/vocabulary/sentinel_value> a skos:ConceptScheme ;
+    dcterms:title "sentinel_value" ;
+    owl:versionInfo "0.0.1" ;
+    skos:hasTopConcept liblab:LIBLAB_0000009,
+        liblab:LIBLAB_0000010,
+        liblab:LIBLAB_0000011 .
+
+<https://w3id.org/liblab/vocabulary/tissue_type> a skos:ConceptScheme ;
+    dcterms:title "tissue_type" ;
+    owl:versionInfo "0.0.1" ;
+    skos:hasTopConcept liblab:LIBLAB_0000005,
+        liblab:LIBLAB_0000006,
+        liblab:LIBLAB_0000008 .
+

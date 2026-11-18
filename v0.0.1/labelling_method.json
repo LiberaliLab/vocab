@@ -1,0 +1,21 @@
+{
+  "vocabulary": "labelling_method",
+  "version": "0.0.1",
+  "iri": "https://w3id.org/liblab/vocabulary/labelling_method",
+  "terms": [
+    {
+      "id": "LIBLAB:0000004",
+      "iri": "https://w3id.org/liblab/LIBLAB_0000004",
+      "label": "immunofluorescence",
+      "definition": "Labelling in which antibodies carrying a fluorophore, either directly or through a fluorescent secondary antibody, are used to detect specific antigens in the sample.",
+      "synonyms": [
+        "IF",
+        "immunofluorescent staining"
+      ],
+      "parent_id": null,
+      "status": "active",
+      "replaced_by": null,
+      "external_mappings": []
+    }
+  ]
+}

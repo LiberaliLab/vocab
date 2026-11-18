@@ -1,0 +1,68 @@
+{
+  "LIBLAB:0000001": {
+    "vocabulary": "imaging_modality",
+    "label": "microscopy",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000001"
+  },
+  "LIBLAB:0000002": {
+    "vocabulary": "imaging_modality",
+    "label": "light-sheet microscopy",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000002"
+  },
+  "LIBLAB:0000003": {
+    "vocabulary": "imaging_modality",
+    "label": "high content microscopy",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000003"
+  },
+  "LIBLAB:0000004": {
+    "vocabulary": "labelling_method",
+    "label": "immunofluorescence",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000004"
+  },
+  "LIBLAB:0000005": {
+    "vocabulary": "tissue_type",
+    "label": "tissue",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000005"
+  },
+  "LIBLAB:0000006": {
+    "vocabulary": "tissue_type",
+    "label": "cell culture",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000006"
+  },
+  "LIBLAB:0000007": {
+    "vocabulary": "tissue_type",
+    "label": "cell line",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000007"
+  },
+  "LIBLAB:0000008": {
+    "vocabulary": "tissue_type",
+    "label": "organoid",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000008"
+  },
+  "LIBLAB:0000009": {
+    "vocabulary": "sentinel_value",
+    "label": "unknown",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000009"
+  },
+  "LIBLAB:0000010": {
+    "vocabulary": "sentinel_value",
+    "label": "na",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000010"
+  },
+  "LIBLAB:0000011": {
+    "vocabulary": "sentinel_value",
+    "label": "unavailable",
+    "status": "active",
+    "iri": "https://w3id.org/liblab/LIBLAB_0000011"
+  }
+}

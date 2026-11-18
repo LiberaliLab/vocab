@@ -1,0 +1,19 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix liblab: <https://w3id.org/liblab/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+liblab:LIBLAB_0000004 a skos:Concept ;
+    skos:altLabel "IF"@en,
+        "immunofluorescent staining"@en ;
+    skos:definition "Labelling in which antibodies carrying a fluorophore, either directly or through a fluorescent secondary antibody, are used to detect specific antigens in the sample."@en ;
+    skos:inScheme <https://w3id.org/liblab/vocabulary/labelling_method> ;
+    skos:notation "LIBLAB:0000004" ;
+    skos:prefLabel "immunofluorescence"@en ;
+    skos:topConceptOf <https://w3id.org/liblab/vocabulary/labelling_method> .
+
+<https://w3id.org/liblab/vocabulary/labelling_method> a skos:ConceptScheme ;
+    dcterms:title "labelling_method" ;
+    owl:versionInfo "0.0.1" ;
+    skos:hasTopConcept liblab:LIBLAB_0000004 .
+

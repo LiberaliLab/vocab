@@ -1,0 +1,4 @@
+id,label,definition,synonyms,parent_id,status,replaced_by,external_mapping
+LIBLAB:0000001,microscopy,Imaging of a specimen at magnification using a microscope.,,,active,,FBbi:00000241
+LIBLAB:0000002,light-sheet microscopy,"Fluorescence microscopy in which the sample is illuminated from the side by a thin sheet of light, so that only the focal plane is excited, and imaged through a detection objective perpendicular to the sheet.",light sheet fluorescence microscopy|LSFM|selective plane illumination microscopy|SPIM,LIBLAB:0000001,active,,FBbi:00000369
+LIBLAB:0000003,high content microscopy,"Automated microscopy of many samples, typically in multi-well plates, combined with quantitative image analysis that extracts many measurements per cell or sample.",high content imaging|high-content microscopy,LIBLAB:0000001,active,,

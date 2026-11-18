@@ -1,0 +1,2 @@
+id,label,definition,synonyms,parent_id,status,replaced_by,external_mapping
+LIBLAB:0000004,immunofluorescence,"Labelling in which antibodies carrying a fluorophore, either directly or through a fluorescent secondary antibody, are used to detect specific antigens in the sample.",IF|immunofluorescent staining,,active,,

@@ -1,0 +1,53 @@
+{
+  "vocabulary": "tissue_type",
+  "version": "0.0.1",
+  "iri": "https://w3id.org/liblab/vocabulary/tissue_type",
+  "terms": [
+    {
+      "id": "LIBLAB:0000005",
+      "iri": "https://w3id.org/liblab/LIBLAB_0000005",
+      "label": "tissue",
+      "definition": "Sample material taken directly from an organism, such as a biopsy, explant or dissected organ, rather than grown in culture.",
+      "synonyms": [],
+      "parent_id": null,
+      "status": "active",
+      "replaced_by": null,
+      "external_mappings": []
+    },
+    {
+      "id": "LIBLAB:0000006",
+      "iri": "https://w3id.org/liblab/LIBLAB_0000006",
+      "label": "cell culture",
+      "definition": "Sample material consisting of cells grown in vitro, outside the organism they came from.",
+      "synonyms": [],
+      "parent_id": null,
+      "status": "active",
+      "replaced_by": null,
+      "external_mappings": []
+    },
+    {
+      "id": "LIBLAB:0000007",
+      "iri": "https://w3id.org/liblab/LIBLAB_0000007",
+      "label": "cell line",
+      "definition": "A cell culture derived from an established cell population that can be propagated over many passages.",
+      "synonyms": [
+        "established cell line"
+      ],
+      "parent_id": "LIBLAB:0000006",
+      "status": "active",
+      "replaced_by": null,
+      "external_mappings": []
+    },
+    {
+      "id": "LIBLAB:0000008",
+      "iri": "https://w3id.org/liblab/LIBLAB_0000008",
+      "label": "organoid",
+      "definition": "A three-dimensional multicellular structure grown in vitro from stem or progenitor cells that self-organises to reproduce aspects of an organ's architecture and function.",
+      "synonyms": [],
+      "parent_id": null,
+      "status": "active",
+      "replaced_by": null,
+      "external_mappings": []
+    }
+  ]
+}

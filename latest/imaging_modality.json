@@ -1,0 +1,52 @@
+{
+  "vocabulary": "imaging_modality",
+  "version": "0.0.1",
+  "iri": "https://w3id.org/liblab/vocabulary/imaging_modality",
+  "terms": [
+    {
+      "id": "LIBLAB:0000001",
+      "iri": "https://w3id.org/liblab/LIBLAB_0000001",
+      "label": "microscopy",
+      "definition": "Imaging of a specimen at magnification using a microscope.",
+      "synonyms": [],
+      "parent_id": null,
+      "status": "active",
+      "replaced_by": null,
+      "external_mappings": [
+        "FBbi:00000241"
+      ]
+    },
+    {
+      "id": "LIBLAB:0000002",
+      "iri": "https://w3id.org/liblab/LIBLAB_0000002",
+      "label": "light-sheet microscopy",
+      "definition": "Fluorescence microscopy in which the sample is illuminated from the side by a thin sheet of light, so that only the focal plane is excited, and imaged through a detection objective perpendicular to the sheet.",
+      "synonyms": [
+        "light sheet fluorescence microscopy",
+        "LSFM",
+        "selective plane illumination microscopy",
+        "SPIM"
+      ],
+      "parent_id": "LIBLAB:0000001",
+      "status": "active",
+      "replaced_by": null,
+      "external_mappings": [
+        "FBbi:00000369"
+      ]
+    },
+    {
+      "id": "LIBLAB:0000003",
+      "iri": "https://w3id.org/liblab/LIBLAB_0000003",
+      "label": "high content microscopy",
+      "definition": "Automated microscopy of many samples, typically in multi-well plates, combined with quantitative image analysis that extracts many measurements per cell or sample.",
+      "synonyms": [
+        "high content imaging",
+        "high-content microscopy"
+      ],
+      "parent_id": "LIBLAB:0000001",
+      "status": "active",
+      "replaced_by": null,
+      "external_mappings": []
+    }
+  ]
+}
