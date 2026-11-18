@@ -3,7 +3,8 @@
 1. Read every vocabulary tab from the sheet.
 2. Give new rows IDs and turn parent/replacement labels into IDs.
 3. Write those IDs back into the sheet (after checking nobody moved the rows).
-4. Validate, and return the vocabularies plus a Markdown report for the PR.
+4. Copy the header notes of the TEMPLATE tab onto every vocabulary tab.
+5. Validate, and return the vocabularies plus a Markdown report for the PR.
 
 Validation problems do not stop the sync: they go into the report so the pull
 request shows the editor what to fix. Problems that make the sheet unreadable
@@ -23,6 +24,10 @@ from .sheets import SheetSource
 from .validate import VOCAB_NAME_RE, Issue, validate
 
 ID_COLUMN = COLUMNS.index("id") + 1
+# A tab with this exact name is the model for new vocabularies. Its name is not a
+# valid vocabulary name, so it is never synced itself; its header notes are copied
+# to every vocabulary tab.
+TEMPLATE_TAB = "TEMPLATE"
 
 
 class SyncError(RuntimeError):
@@ -36,6 +41,7 @@ class SyncResult:
     resolved: list[tuple[Term, str, str]] = field(default_factory=list)
     cleaned: list[str] = field(default_factory=list)
     ignored_tabs: list[str] = field(default_factory=list)
+    notes_updated: list[str] = field(default_factory=list)
     issues: list[Issue] = field(default_factory=list)
 
     @property
@@ -123,6 +129,35 @@ def _check_unchanged(fresh: dict[str, list[list[str]]], planned: dict[str, list[
                 )
 
 
+def sync_header_notes(
+    source: SheetSource, tabs: dict[str, list[list[str]]], vocabularies: Sequence[str]
+) -> list[str]:
+    """Make the header notes of every vocabulary tab match the TEMPLATE tab.
+
+    TEMPLATE is the single source: a note removed there is removed everywhere.
+    Nothing happens if there is no TEMPLATE tab, or if it has no notes at all (so
+    deleting the template by mistake does not wipe the notes). Only notes on row 1
+    are touched, never cell values. Returns the tabs that were changed.
+    """
+    if TEMPLATE_TAB not in tabs:
+        return []
+    wanted = source.read_header_notes(TEMPLATE_TAB)
+    if not any(wanted):
+        return []
+    updated = []
+    for name in vocabularies:
+        current = source.read_header_notes(name)
+        changes = {
+            col: note
+            for col, (note, have) in enumerate(zip(wanted, current), start=1)
+            if note != have
+        }
+        if changes:
+            source.write_header_notes(name, changes)
+            updated.append(name)
+    return updated
+
+
 def sync(
     source: SheetSource,
     config: Config,
@@ -131,7 +166,8 @@ def sync(
     write_back: bool = True,
 ) -> SyncResult:
     """Run the sync. current is the repository's state (main); baselines are older states."""
-    vocabs, ignored, cleaned = read_sheet(source.read_tabs(), list(current))
+    tabs = source.read_tabs()
+    vocabs, ignored, cleaned = read_sheet(tabs, list(current))
     result = SyncResult(vocabs, ignored_tabs=ignored, cleaned=cleaned)
 
     id_sources = [current, *(b for _, b in baselines)]
@@ -143,6 +179,8 @@ def sync(
         _check_unchanged(source.read_tabs(), planned)
         for tab, cells in planned.items():
             source.write_cells(tab, [(term.line, col, value) for term, col, value in cells])
+    if write_back:
+        result.notes_updated = sync_header_notes(source, tabs, sorted(vocabs))
 
     result.issues = validate(vocabs, config, [("main", current), *baselines])
     return result
@@ -193,6 +231,8 @@ def report(
         lines.append(
             f"If released now, the version after {name} needs a **{required_bump(changes)}** bump."
         )
+    if result.notes_updated:
+        lines += ["", f"Header notes copied from {TEMPLATE_TAB} to: {', '.join(result.notes_updated)}"]
     if result.ignored_tabs:
         lines += ["", f"Tabs ignored (not vocabularies): {', '.join(result.ignored_tabs)}"]
     return "\n".join(lines) + "\n"
