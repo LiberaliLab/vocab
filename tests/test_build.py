@@ -1,6 +1,9 @@
 import csv
+import dataclasses
 import io
 import json
+
+import pytest
 
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import DCTERMS, OWL, SKOS
@@ -25,10 +28,10 @@ def test_json_output(config, tmp_path):
     data = json.loads((tmp_path / "stain.json").read_text())
     assert data["vocabulary"] == "stain"
     assert data["version"] == "1.2.3"
+    assert "iri" not in data
     dapi = data["terms"][1]
     assert dapi == {
         "id": "LIBLAB:0000002",
-        "iri": "https://w3id.org/liblab/LIBLAB_0000002",
         "label": "DAPI",
         "definition": "Definition of DAPI.",
         "synonyms": ["dapi blue", "D"],
@@ -40,8 +43,30 @@ def test_json_output(config, tmp_path):
     index = json.loads((tmp_path / "index.json").read_text())
     assert [v["name"] for v in index["vocabularies"]] == ["cell_line", "stain"]
     assert index["vocabularies"][1]["active_terms"] == 2
+    assert index["vocabularies"][1]["files"] == {"json": "stain.json", "csv": "stain.csv"}
     terms = json.loads((tmp_path / "terms.json").read_text())
-    assert terms["LIBLAB:0000004"]["vocabulary"] == "cell_line"
+    assert terms["LIBLAB:0000004"] == {"vocabulary": "cell_line", "label": "HeLa", "status": "active"}
+
+
+def test_default_build_has_no_turtle(config, tmp_path):
+    build(sample(), config, "1.2.3", tmp_path)
+    assert list(tmp_path.glob("*.ttl")) == []
+
+
+@pytest.fixture
+def full_config(config):
+    """The settings for once the w3id.org namespace resolves."""
+    return dataclasses.replace(config, formats=("json", "csv", "ttl"), publish_iris=True)
+
+
+def test_iris_in_json_when_enabled(full_config, tmp_path):
+    build(sample(), full_config, "1.2.3", tmp_path)
+    data = json.loads((tmp_path / "stain.json").read_text())
+    assert data["iri"] == "https://w3id.org/liblab/vocabulary/stain"
+    assert list(data["terms"][1])[:2] == ["id", "iri"]
+    assert data["terms"][1]["iri"] == "https://w3id.org/liblab/LIBLAB_0000002"
+    terms = json.loads((tmp_path / "terms.json").read_text())
+    assert terms["LIBLAB:0000004"]["iri"] == "https://w3id.org/liblab/LIBLAB_0000004"
 
 
 def test_csv_output(config, tmp_path):
@@ -51,8 +76,8 @@ def test_csv_output(config, tmp_path):
     assert len(rows) == 3
 
 
-def test_skos_output(config, tmp_path):
-    build(sample(), config, "1.2.3", tmp_path)
+def test_skos_output(full_config, tmp_path):
+    build(sample(), full_config, "1.2.3", tmp_path)
     g = Graph().parse(tmp_path / "stain.ttl")
     base = "https://w3id.org/liblab/"
     stain, dapi, old = (URIRef(f"{base}LIBLAB_000000{n}") for n in (1, 2, 3))
@@ -70,8 +95,17 @@ def test_skos_output(config, tmp_path):
     assert len(combined) > len(g)
 
 
-def test_build_repository_vocabularies(config, tmp_path):
-    files = build(load_dir(ROOT / "vocabularies"), config, "0.1.0", tmp_path)
+def test_build_repository_vocabularies(full_config, tmp_path):
+    files = build(load_dir(ROOT / "vocabularies"), full_config, "0.1.0", tmp_path)
     assert (tmp_path / "imaging_modality.ttl") in files
     for path in tmp_path.glob("*.ttl"):
         Graph().parse(path)
+
+
+def test_unknown_format_is_rejected(tmp_path):
+    from liblab_vocab.config import load_config
+
+    toml = (ROOT / "vocab.toml").read_text().replace('formats = ["json", "csv"]', 'formats = ["json", "xml"]')
+    (tmp_path / "vocab.toml").write_text(toml)
+    with pytest.raises(ValueError, match="formats must be"):
+        load_config(tmp_path / "vocab.toml")

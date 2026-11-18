@@ -16,7 +16,9 @@ BASE = "https://liberalilab.github.io/vocab"
 vocab = requests.get(f"{BASE}/v1.4.0/imaging_modality.json").json()
 ```
 
-Each release has, per vocabulary, `<name>.json`, `<name>.csv` and `<name>.ttl` (SKOS). It also has `all.ttl` with every vocabulary, `terms.json` mapping every ID to its vocabulary, and `index.json` listing what the release contains.
+Each release has, per vocabulary, `<name>.json` and `<name>.csv`. It also has `terms.json` mapping every ID to its vocabulary, and `index.json` listing what the release contains.
+
+SKOS/Turtle files (`<name>.ttl`, `all.ttl`) and term IRIs in the JSON are switched off until the `w3id.org/liblab/` namespace is registered and the IRIs resolve. Both are turned back on under `[publish]` in `vocab.toml`.
 
 ## How it works
 
@@ -38,7 +40,7 @@ Each release has, per vocabulary, `<name>.json`, `<name>.csv` and `<name>.ttl` (
 | `parent_id` | no | ID of the broader term in the same vocabulary. New rows may give the parent's label instead; it is turned into the ID when IDs are assigned. |
 | `status` | yes | `active` or `deprecated`. |
 | `replaced_by` | no | For deprecated terms: ID (or label) of the active term that replaces it. |
-| `external_mapping` | no | Matching term in another ontology, e.g. `FBbi:00000241`. Several are separated by `\|`. Allowed prefixes are listed in `vocab.toml`. In SKOS output it becomes `skos:exactMatch`. |
+| `external_mapping` | no | Matching term in another ontology, e.g. `FBbi:00000241`. Several are separated by `\|`. Allowed prefixes are listed in `vocab.toml`. In SKOS output (when enabled) it becomes `skos:exactMatch`. |
 
 ## Releasing (curator)
 
