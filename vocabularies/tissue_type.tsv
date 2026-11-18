@@ -3,4 +3,3 @@ LIBLAB:0000005	tissue	Sample material taken directly from an organism, such as a
 LIBLAB:0000006	cell culture	Sample material consisting of cells grown in vitro, outside the organism they came from.			active		
 LIBLAB:0000007	cell line	A cell culture derived from an established cell population that can be propagated over many passages.	established cell line	LIBLAB:0000006	active		
 LIBLAB:0000008	organoid	A three-dimensional multicellular structure grown in vitro from stem or progenitor cells that self-organises to reproduce aspects of an organ's architecture and function.			active		
-LIBLAB:0000009	unknown	The type of sample material is not known or was not recorded.			active		
