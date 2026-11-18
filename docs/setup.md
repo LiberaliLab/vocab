@@ -59,6 +59,7 @@ The sync signs in to Google with **Workload Identity Federation**: GitHub Action
   - Row 1 is the header `id, label, definition, synonyms, parent_id, status, replaced_by, external_mapping`, in that order. Do not add other columns.
   - Data validation on the `status` column: a dropdown with `active` and `deprecated`.
   - Protect the `id` column (Data → Protect sheets and ranges) so that only the service account and the curator can edit it.
+  - Optionally add a `TEMPLATE` tab (exactly that name): a copy of a vocabulary tab with only the header row. To start a new vocabulary, duplicate it and rename the copy to a lowercase name such as `cell_line`. The sync ignores `TEMPLATE` itself, and copies its header-row notes to every vocabulary tab, so edit the column notes there. Removing a note in `TEMPLATE` removes it everywhere.
   - Optionally add a `README` tab with the editing rules. Tabs without the vocabulary header are ignored. Renaming or deleting a vocabulary tab stops the sync with an error.
 - [ ] **Store the sheet ID** (the long part of its URL, between `/d/` and `/edit`) as the repository variable `SHEET_ID`.
 - [ ] **Test it:** Actions → sync → Run workflow (on `main`). The first run should report no changes. Then add a test row to the sheet, run it again, and check that an ID appears in the sheet and a pull request opens with the `validate` check running on it.

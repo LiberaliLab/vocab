@@ -13,8 +13,10 @@ HEADER = list(COLUMNS)
 class FakeSheet:
     """An in-memory sheet. on_read can change the tabs between reads."""
 
-    def __init__(self, tabs):
+    def __init__(self, tabs, notes=None):
         self.tabs = tabs
+        self.notes = notes or {}  # tab -> list of header notes
+        self.note_writes = []
         self.writes = []
         self.reads = 0
         self.on_read = None
@@ -31,6 +33,17 @@ class FakeSheet:
             line = self.tabs[tab][row - 1]
             line += [""] * (col - len(line))
             line[col - 1] = value
+
+    def read_header_notes(self, tab):
+        notes = list(self.notes.get(tab, []))
+        return notes + [""] * (len(COLUMNS) - len(notes))
+
+    def write_header_notes(self, tab, notes):
+        self.note_writes.append((tab, dict(notes)))
+        current = self.read_header_notes(tab)
+        for col, text in notes.items():
+            current[col - 1] = text
+        self.notes[tab] = current
 
     def url(self):
         return "https://docs.google.com/spreadsheets/d/test"
@@ -143,3 +156,58 @@ def test_report_lists_changes_and_bump(config):
     assert "| minor | term added | stain |" in body
     assert "| patch | definition changed |" in body
     assert "needs a **minor** bump" in body
+
+
+NOTES = ["Leave empty.", "Preferred name.", "", "Separate with |", "", "active or deprecated", "", ""]
+
+
+def notes_sheet():
+    return FakeSheet(
+        {
+            "TEMPLATE": [HEADER],
+            "stain": [HEADER, row("LIBLAB:0000001", "nuclear stain", "x")],
+            "dye": [HEADER],
+        },
+        notes={
+            "TEMPLATE": NOTES,
+            "stain": ["old note", "Preferred name.", "", "", "", "", "", "a stray note"],
+        },
+    )
+
+
+def test_template_tab_is_ignored_and_its_notes_copied(config):
+    sheet = notes_sheet()
+    result = sync(sheet, config, current())
+    assert "TEMPLATE" in result.ignored_tabs
+    assert "TEMPLATE" not in result.vocabs
+    assert sheet.read_header_notes("stain") == NOTES
+    assert sheet.read_header_notes("dye") == NOTES
+    assert result.notes_updated == ["dye", "stain"]
+    # Only differing cells are written, and stray notes are cleared.
+    stain_write = dict(sheet.note_writes)["stain"]
+    assert stain_write == {1: "Leave empty.", 4: "Separate with |", 6: "active or deprecated", 8: ""}
+    assert "Header notes copied from TEMPLATE to: dye, stain" in report(result, current(), sheet.url())
+
+
+def test_notes_already_in_sync_are_not_rewritten(config):
+    sheet = notes_sheet()
+    sync(sheet, config, current())
+    sheet.note_writes.clear()
+    result = sync(sheet, config, current())
+    assert sheet.note_writes == []
+    assert result.notes_updated == []
+
+
+def test_no_template_or_empty_template_changes_nothing(config):
+    sheet = notes_sheet()
+    sheet.notes["TEMPLATE"] = [""] * 8
+    assert sync(sheet, config, current()).notes_updated == []
+    del sheet.tabs["TEMPLATE"]
+    assert sync(sheet, config, current()).notes_updated == []
+    assert sheet.read_header_notes("stain")[0] == "old note"
+
+
+def test_no_write_back_leaves_notes_alone(config):
+    sheet = notes_sheet()
+    sync(sheet, config, current(), write_back=False)
+    assert sheet.note_writes == []
