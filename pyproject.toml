@@ -8,6 +8,13 @@ dependencies = [
     "rdflib>=7.0",
 ]
 
+[project.optional-dependencies]
+# Needed only by `vocab sync-sheet`.
+sheets = [
+    "gspread>=6.1",
+    "google-auth>=2.30",
+]
+
 [project.scripts]
 vocab = "liblab_vocab.cli:main"
 

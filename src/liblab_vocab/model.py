@@ -73,26 +73,38 @@ def all_terms(vocabs: Vocabularies) -> Iterator[Term]:
         yield from vocabs[name]
 
 
-def parse_tsv(vocabulary: str, text: str) -> list[Term]:
-    rows = list(csv.reader(io.StringIO(text), delimiter="\t", quoting=csv.QUOTE_NONE))
+def has_header(row: list[str]) -> bool:
+    cells = [cell.strip() for cell in row]
+    while cells and not cells[-1]:
+        cells.pop()
+    return tuple(cells) == COLUMNS
+
+
+def parse_rows(vocabulary: str, rows: list[list[str]], source: str | None = None) -> list[Term]:
+    """Turn rows (header first) into terms. Term.line is the 1-based row number."""
+    source = source or f"{vocabulary}.tsv"
     if not rows:
-        raise VocabFormatError(f"{vocabulary}.tsv is empty; it needs at least the header row")
-    header = tuple(cell.strip() for cell in rows[0])
-    if header != COLUMNS:
+        raise VocabFormatError(f"{source} is empty; it needs at least the header row")
+    if not has_header(rows[0]):
+        found = ", ".join(cell.strip() for cell in rows[0] if cell.strip())
         raise VocabFormatError(
-            f"{vocabulary}.tsv: the header must be exactly {', '.join(COLUMNS)} "
-            f"(found {', '.join(header)})"
+            f"{source}: the header must be exactly {', '.join(COLUMNS)} (found {found})"
         )
     terms = []
     for line, row in enumerate(rows[1:], start=2):
         if not any(cell.strip() for cell in row):
             continue
         if any(cell.strip() for cell in row[len(COLUMNS) :]):
-            raise VocabFormatError(f"{vocabulary}.tsv:{line}: more than {len(COLUMNS)} columns")
+            raise VocabFormatError(f"{source}:{line}: more than {len(COLUMNS)} columns")
         cells = [cell.strip() for cell in row[: len(COLUMNS)]]
         cells += [""] * (len(COLUMNS) - len(cells))
         terms.append(Term(vocabulary, line, *cells))
     return terms
+
+
+def parse_tsv(vocabulary: str, text: str) -> list[Term]:
+    rows = list(csv.reader(io.StringIO(text), delimiter="\t", quoting=csv.QUOTE_NONE))
+    return parse_rows(vocabulary, rows)
 
 
 def serialize_tsv(terms: list[Term]) -> str:

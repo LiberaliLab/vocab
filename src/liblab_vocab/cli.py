@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from .diff import actual_bump, diff, format_markdown, required_bump
 from .ids import assign_ids, resolve_label_references
 from .model import VocabFormatError, Vocabularies, load_dir, write_dir
 from .site import SiteError, publish
+from .sync import SyncError, report, sync
 from .validate import has_errors, validate
 
 WORKTREE = "WORKTREE"
@@ -126,6 +128,30 @@ def cmd_build(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_sync_sheet(args: argparse.Namespace, config: Config) -> int:
+    from .sheets import GoogleSheet
+
+    sheet_id = args.sheet or os.environ.get("SHEET_ID")
+    if not sheet_id:
+        print("ERROR: give --sheet or set SHEET_ID", file=sys.stderr)
+        return 1
+    source = GoogleSheet(sheet_id)
+    current = _load(WORKTREE, config, args.repo)
+    latest = gitrefs.latest_release(args.repo)
+    baselines = [(latest, gitrefs.load_ref(latest, config.directory, args.repo))] if latest else []
+    result = sync(source, config, current, baselines, write_back=not args.no_write_back)
+    write_dir(result.vocabs, Path(args.repo) / config.directory)
+    text = report(result, current, source.url(), baselines[0] if baselines else None)
+    print(text)
+    if args.report:
+        Path(args.report).write_text(text, encoding="utf-8")
+    print(
+        f"{len(result.assigned)} IDs assigned, {len(result.errors)} validation errors "
+        "(reported, not fatal)."
+    )
+    return 0
+
+
 def cmd_publish_site(args: argparse.Namespace, config: Config) -> int:
     latest = publish(args.site, args.build, args.version, config)
     print(f"Published {args.version} into {args.site}; latest/ is now v{latest}.")
@@ -185,11 +211,23 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--version", required=True)
     p.set_defaults(func=cmd_publish_site)
 
+    p = sub.add_parser(
+        "sync-sheet",
+        help="pull the Google Sheet into vocabularies/, assigning IDs and writing them back",
+    )
+    p.add_argument("--sheet", help="Google Sheet ID (default: $SHEET_ID)")
+    p.add_argument("--report", help="write the Markdown report (pull request body) to this file")
+    p.add_argument(
+        "--no-write-back", action="store_true",
+        help="do not write IDs into the sheet (for trying the sync locally)",
+    )
+    p.set_defaults(func=cmd_sync_sheet)
+
     args = parser.parse_args(argv)
     config = load_config(args.config or Path(args.repo) / "vocab.toml")
     try:
         return args.func(args, config)
-    except (VocabFormatError, SiteError, RuntimeError, ValueError) as error:
+    except (VocabFormatError, SiteError, SyncError, RuntimeError, ValueError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
