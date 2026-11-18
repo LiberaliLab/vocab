@@ -1,2 +1,4 @@
 id	label	definition	synonyms	parent_id	status	replaced_by	external_mapping
 LIBLAB:0000009	unknown	term value is unknown to the curator			active		
+LIBLAB:0000010	na	term does not apply			active		
+LIBLAB:0000011	unavailable	term is know but missing from the vocabulary			active		
